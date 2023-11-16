@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../Realidad Virtual/ProyectoCorte3"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Edificios"
+	}
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <meta charset="utf-8" />
+    <title>Caos 3D</title>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+    <meta charset="utf-8" />
+  </head>
+
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r119/three.js"></script>
+    <script src="OrbitControls.js"></script>
+    <script src="CrearCalle.js"></script>
+    <script src="CrearEdificio.js"></script>
+
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+       
+       
+      scene.background = new THREE.CubeTextureLoader()
+        .setPath('imagenes/')
+        .load([
+              'skyhsky_lf.png',
+              'skyhsky_rt.png',
+              'skyhsky_up.png',
+              'skyhsky_dn.png',
+              'skyhsky_ft.png',
+              'skyhsky_bk.png',
+             ]);
+
+       
+
+
+      var k = 25;
+      var MatrixA = new Array(k);
+      var MatrixB = new Array(k);
+      var texturas = ["Edificios/edificio1.jpg", "Edificios/edificio2.jpg", "Edificios/edificio3.jpg"];
+      
+
+      for (var i = 0; i < k; i++) {
+        MatrixA[i] = new Array(k);
+        for (var j = 0; j < k; j++) {
+          var r = Math.random();
+          if (j % 2 == 0 && i % 2 == 0 && r <= 0.3) {
+            MatrixA[i][j] = 1;
+            //console.log("es par");
+          } else {
+            MatrixA[i][j] = 0;
+            //console.log("es inpar");
+          }
+        }
+      }
+      for (var i = 0; i < k; i++) {
+        MatrixB[i] = new Array(k);
+        for (var j = 0; j < k; j++) {
+          MatrixB[i][j] = 0;
+        }
+      }
+      console.log(MatrixA);
+      console.log(MatrixB);
+
+      for (var i = 0; i < k; i++) {
+        for (var j = 0; j < k; j++) {
+          if (MatrixA[i][j] == 1) {
+            var tipo = Math.floor(Math.random() * 4);
+            switch (tipo) {
+              case 0:
+                for (var i2 = i; i2 < k; i2++) {
+                  MatrixB[i2][j] = 1;
+                }
+                break;
+              case 1:
+                for (var j2 = j; j2 < k; j2++) {
+                  MatrixB[i][j2] = 1;
+                }
+                for (var i2 = 0; i2 < k; i2++) {
+                  MatrixB[i2][j] = 1;
+                }
+                break;
+              case 2:
+                for (var j2 = j; j2 < k; j2++) {
+                  MatrixB[i][j2] = 1;
+                }
+                for (var i2 = i; i2 < k; i2++) {
+                  MatrixB[i2][j] = 1;
+                }
+                break;
+              case 3:
+                for (var j2 = j; j2 < k; j2++) {
+                  MatrixB[i][j2] = 0;
+                }
+                break;
+              default:
+                break;
+            }
+          }
+        }
+      }
+      camera.position.z = 20;
+      function CrearParque(X, Z) {
+        const geometryP = new THREE.BoxGeometry(3, 18, 3);
+        var texture = new THREE.TextureLoader().load("Edificios/edificio1.jpg");
+        var material = new THREE.MeshBasicMaterial({ map: texture });
+        if (X != 0 && X != k - 1 && Z != 0 && Z != k - 1) {
+          if (MatrixB[X - 1][Z - 1] == 0 &&
+              MatrixB[X - 1][Z ] == 0 &&
+              MatrixB[X - 1][Z +1] == 0 &&
+              MatrixB[X][Z - 1] == 0 &&
+              MatrixB[X][Z] == 0 &&
+              MatrixB[X][Z + 1] == 0 &&
+              MatrixB[X + 1][Z - 1] == 0 &&
+              MatrixB[X + 1][Z] == 0 &&
+              MatrixB[X + 1][Z + 1] == 0
+              ) {
+            texture = new THREE.ImageUtils.loadTexture("Edificios/edificio1.jpg");
+            material = new THREE.MeshBasicMaterial({map: texture});
+          }   
+        }
+      }    
+
+        for (var i = 0; i < k; i++) {
+        for (var j = 0; j < k; j++) {
+          if (MatrixB[i][j] == 1) {
+            CrearCalle(i, j);           
+          } else if (MatrixB[i][j] == 0) {
+            CrearEdificio(i, j);
+            CrearParque(i,j);
+          }        
+        }
+      }
+
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+    </script>
+  </body>
+</html>
